@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EMA SIGNAL PRO</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+
+body {
+    margin:0;
+    font-family:Arial, sans-serif;
+    background:#0f172a;
+    color:white;
+}
+
+header {
+    background:#111827;
+    padding:15px;
+    text-align:center;
+    font-size:22px;
+    font-weight:bold;
+    color:gold;
+}
+
+nav {
+    text-align:center;
+    padding:10px;
+    background:#1f2937;
+    font-size:14px;
+}
+
+.container {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    padding:20px;
+}
+
+.card {
+    background:#1e293b;
+    margin:15px;
+    padding:20px;
+    width:320px;
+    border-radius:20px;
+    box-shadow:0 0 20px rgba(0,0,0,0.5);
+    transition:0.3s;
+}
+
+.card:hover {
+    transform:scale(1.05);
+}
+
+.buy {
+    color:#00ff88;
+    animation:glowBuy 1s infinite alternate;
+}
+
+.sell {
+    color:#ff4d4d;
+    animation:glowSell 1s infinite alternate;
+}
+
+@keyframes glowBuy {
+    from { text-shadow:0 0 5px #00ff88; }
+    to { text-shadow:0 0 25px #00ff88; }
+}
+
+@keyframes glowSell {
+    from { text-shadow:0 0 5px #ff4d4d; }
+    to { text-shadow:0 0 25px #ff4d4d; }
+}
+
+.statusOpen { color:#38bdf8; }
+.statusBEP { color:yellow; }
+.statusClosed { color:gray; }
+
+.stats {
+    text-align:center;
+    padding:15px;
+    background:#111827;
+}
+
+footer {
+    text-align:center;
+    padding:15px;
+    background:#1f2937;
+    font-size:12px;
+    color:#9ca3af;
+}
+
+button {
+    padding:8px 15px;
+    border:none;
+    border-radius:10px;
+    background:gold;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+</style>
+</head>
+<body>
+
+<header>EMA SIGNAL PRO</header>
+
+<nav>
+Live Market Signal | EMA Strategy | Auto BEP & Trailing
+</nav>
+
+<div class="stats">
+<p id="clock"></p>
+<p>Total Trades: <span id="totalTrade">0</span></p>
+<p>Closed Trades: <span id="closedTrade">0</span></p>
+</div>
+
+<div class="container">
+
+<div class="card" id="EURUSD">
+<h3>EURUSD</h3>
+<p class="trend"></p>
+<p class="signal"></p>
+<p class="entry"></p>
+<p class="status"></p>
+</div>
+
+<div class="card" id="XAUUSD">
+<h3>XAUUSD</h3>
+<p class="trend"></p>
+<p class="signal"></p>
+<p class="entry"></p>
+<p class="status"></p>
+</div>
+
+</div>
+
+<footer>
+© 2026 EMA SIGNAL PRO - All Rights Reserved
+</footer>
+
+<script>
+
+let totalTrade=0;
+let closedTrade=0;
+
+function updateClock(){
+    document.getElementById("clock").innerHTML =
+    new Date().toLocaleString();
+}
+setInterval(updateClock,1000);
+
+function createEngine(pairId){
+
+    let tradeOpen=false;
+    let entryPrice=0;
+
+    return function(){
+
+        let card=document.getElementById(pairId);
+        let trend=card.querySelector(".trend");
+        let signal=card.querySelector(".signal");
+        let entry=card.querySelector(".entry");
+        let status=card.querySelector(".status");
+
+        let price=Math.random()*100;
+        let ema50=Math.random()*100;
+        let ema200=Math.random()*100;
+
+        if(!tradeOpen){
+
+            totalTrade++;
+            document.getElementById("totalTrade").innerText=totalTrade;
+
+            if(ema50>ema200){
+                trend.innerHTML="Trend: BULLISH";
+                signal.innerHTML="BUY";
+                signal.className="signal buy";
+            } else{
+                trend.innerHTML="Trend: BEARISH";
+                signal.innerHTML="SELL";
+                signal.className="signal sell";
+            }
+
+            entryPrice=price;
+            entry.innerHTML="Entry: "+entryPrice.toFixed(2);
+            status.innerHTML="Status: OPEN";
+            status.className="status statusOpen";
+
+            tradeOpen=true;
+        }
+        else{
+
+            let profit=price-entryPrice;
+
+            if(Math.abs(profit)>10){
+                status.innerHTML="Status: CLOSED";
+                status.className="status statusClosed";
+
+                closedTrade++;
+                document.getElementById("closedTrade").innerText=closedTrade;
+
+                tradeOpen=false;
+            }
+        }
+    }
+}
+
+let eurusdEngine=createEngine("EURUSD");
+let xauusdEngine=createEngine("XAUUSD");
+
+setInterval(eurusdEngine,4000);
+setInterval(xauusdEngine,5000);
+
+</script>
+
+</body>
+</html>
