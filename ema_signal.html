@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>EMA SIGNAL PRO</title>
+<style>
+body {
+    background:#0f172a;
+    font-family:Arial;
+    color:white;
+    text-align:center;
+}
+
+h1 { color:gold; }
+
+.container {
+    display:flex;
+    justify-content:center;
+    flex-wrap:wrap;
+}
+
+.card {
+    background:#1e293b;
+    margin:20px;
+    padding:25px;
+    width:350px;
+    border-radius:20px;
+    box-shadow:0 0 25px rgba(0,0,0,0.6);
+}
+
+.buy {
+    color:#00ff88;
+    animation: glowBuy 1s infinite alternate;
+}
+
+.sell {
+    color:#ff4d4d;
+    animation: glowSell 1s infinite alternate;
+}
+
+@keyframes glowBuy {
+    from { text-shadow:0 0 5px #00ff88; }
+    to { text-shadow:0 0 25px #00ff88; }
+}
+
+@keyframes glowSell {
+    from { text-shadow:0 0 5px #ff4d4d; }
+    to { text-shadow:0 0 25px #ff4d4d; }
+}
+
+.info { font-size:14px; color:#94a3b8; }
+
+.statusOpen { color:#38bdf8; }
+.statusBEP { color:yellow; }
+.statusClosed { color:gray; }
+
+</style>
+</head>
+<body>
+
+<h1>EMA SIGNAL PRO</h1>
+<p id="clock"></p>
+
+<div class="container">
+
+<div class="card" id="EURUSD">
+<h2>EURUSD</h2>
+<p class="trend"></p>
+<p class="signal"></p>
+<p class="entry info"></p>
+<p class="bep info"></p>
+<p class="trail info"></p>
+<p class="status"></p>
+</div>
+
+<div class="card" id="XAUUSD">
+<h2>XAUUSD</h2>
+<p class="trend"></p>
+<p class="signal"></p>
+<p class="entry info"></p>
+<p class="bep info"></p>
+<p class="trail info"></p>
+<p class="status"></p>
+</div>
+
+</div>
+
+<script>
+
+function updateClock(){
+    document.getElementById("clock").innerHTML =
+    new Date().toLocaleTimeString();
+}
+setInterval(updateClock,1000);
+
+function createEngine(pairId){
+
+    let tradeOpen=false;
+    let entryPrice=0;
+
+    return function(){
+
+        let card=document.getElementById(pairId);
+        let trend=card.querySelector(".trend");
+        let signal=card.querySelector(".signal");
+        let entry=card.querySelector(".entry");
+        let bep=card.querySelector(".bep");
+        let trail=card.querySelector(".trail");
+        let status=card.querySelector(".status");
+
+        let price=Math.random()*100;
+        let ema50=Math.random()*100;
+        let ema200=Math.random()*100;
+
+        if(!tradeOpen){
+
+            if(ema50>ema200){
+                trend.innerHTML="Trend: BULLISH";
+                signal.innerHTML="BUY";
+                signal.className="signal buy";
+            } else{
+                trend.innerHTML="Trend: BEARISH";
+                signal.innerHTML="SELL";
+                signal.className="signal sell";
+            }
+
+            entryPrice=price;
+            entry.innerHTML="Entry: "+entryPrice.toFixed(2);
+            status.innerHTML="Status: OPEN";
+            status.className="status statusOpen";
+            tradeOpen=true;
+        }
+        else{
+
+            let profit=price-entryPrice;
+
+            if(Math.abs(profit)>5){
+                bep.innerHTML="BEP Activated";
+                status.innerHTML="Status: BEP";
+                status.className="status statusBEP";
+            }
+
+            if(Math.abs(profit)>10){
+                trail.innerHTML="Trailing Stop Locked";
+                status.innerHTML="Status: CLOSED";
+                status.className="status statusClosed";
+                tradeOpen=false;
+            }
+        }
+    }
+}
+
+let eurusdEngine=createEngine("EURUSD");
+let xauusdEngine=createEngine("XAUUSD");
+
+setInterval(eurusdEngine,3000);
+setInterval(xauusdEngine,3500);
+
+</script>
+
+</body>
+</html>
